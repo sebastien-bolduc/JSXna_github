@@ -14,6 +14,7 @@ game.Game = function()
     this.graphicsDevice = null;
     this.content = new JSXna.Framework.Content.ContentManager();
     this.mouse = null;
+    this.keyboard = null;
     this.gameTime = null;
 };
 
@@ -26,6 +27,7 @@ game.Game.prototype.initialize = function(gdm)
 {
     this.graphicsDevice = new JSXna.Framework.Graphics.GraphicsDevice(gdm);
     this.mouse = new JSXna.Framework.Input.Mouse(this.graphicsDevice.gdm.canvas);
+    this.keyboard = new JSXna.Framework.Input.Keyboard();
     this.gameTime = new JSXna.Framework.GameTime();
 };
 

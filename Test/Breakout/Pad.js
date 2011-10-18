@@ -30,15 +30,22 @@ pad.Pad.prototype.load = function(content)
 
 /**
  * Update the pad sprite.
+ * @param gameTime Game time elapdsed
  * @param mouseState State of the mouse
+ * @param keyboardState State of the keyboard
  * @return 
  */
-pad.Pad.prototype.update = function(mouseState)
+pad.Pad.prototype.update = function(gameTime, mouseState, keyboardState)
 {
     if (mouseState.button)
     {
         this.x = mouseState.x;
     }
+    
+    if (keyboardState.isKeyDown(Keys.Left))
+        this.x -= Math.ceil(gameTime / 1000 * 300);
+    if (keyboardState.isKeyDown(Keys.Right))
+        this.x += Math.ceil(gameTime / 1000 * 300);
     
     this.padSpriteRect.x = this.x;
 };

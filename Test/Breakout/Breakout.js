@@ -118,7 +118,7 @@ game1.Game1.prototype.update = function(gameTime)
     }
     
     this.ball.update(gameTime.elapsedGameTime, this.graphicsDevice, this.pad, this.blocks);
-    this.pad.update(this.mouse.getState());
+    this.pad.update(gameTime.elapsedGameTime, this.mouse.getState(), this.keyboard.getState());
     
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);
