@@ -32,12 +32,13 @@ ball.Ball.prototype.load = function(content)
 
 /**
  * Update the ball sprite.
+ * @param gameTime Time elapsed for a frame
  * @param graphicsDevice Graphics device object attach to the canvas
- * @param fps Frame per second
  * @param pad Pad the ball hit against
+ * @param blocks List of block the ball hit against
  * @return 
  */
-ball.Ball.prototype.update = function(graphicsDevice, fps, pad)
+ball.Ball.prototype.update = function(gameTime, graphicsDevice, pad, blocks)
 {
     this.x += this.i;
     this.y += this.j;
@@ -59,13 +60,74 @@ ball.Ball.prototype.update = function(graphicsDevice, fps, pad)
     
     if (this.ballSpriteRect.intersects(pad.padSpriteRect))
     {
-        this.j *= -1;
-        this.y += this.j * 2;
+        this.i *= -1;
+        this.x += this.i * 2;
+        this.ballSpriteRect.x = this.x;
+        if (this.ballSpriteRect.intersects(pad.padSpriteRect))
+        {
+            this.i *= -1;
+            this.x += this.i * 2;
+        }
     }
     
-    fps = (fps === 0) ? 60 : fps;
-    this.i = Math.floor(200 / fps) * (this.i / Math.abs(this.i));
-    this.j = Math.floor(150 / fps) * (this.j / Math.abs(this.j));
+    if (this.ballSpriteRect.intersects(pad.padSpriteRect))
+    {
+        this.j *= -1;
+        this.y += this.j * 2;
+        this.ballSpriteRect.y = this.y;
+        if (this.ballSpriteRect.intersects(pad.padSpriteRect))
+        {
+            this.j *= -1;
+            this.y += this.j * 2;
+        }
+    }
+    
+    this.ballSpriteRect.x = this.x;
+    this.ballSpriteRect.y = this.y;
+    
+    for (var i = 0; i < blocks.length; i++)
+    {
+        if (blocks[i] === null)
+            continue;
+        
+        if (this.ballSpriteRect.intersects(blocks[i].blockRect))
+        {
+            this.i *= -1;
+            this.x += this.i * 2;
+            this.ballSpriteRect.x = this.x;
+            if (this.ballSpriteRect.intersects(blocks[i].blockRect))
+            {
+                this.i *= -1;
+                this.x += this.i * 2;
+            }
+            else
+                blocks[i] = null;
+        }
+        
+        if (blocks[i] === null)
+            continue;
+        
+        if (this.ballSpriteRect.intersects(blocks[i].blockRect))
+        {
+            this.j *= -1;
+            this.y += this.j * 2;
+            this.ballSpriteRect.y = this.y;
+            if (this.ballSpriteRect.intersects(blocks[i].blockRect))
+            {
+                this.j *= -1;
+                this.y += this.j * 2;
+            }
+            else
+                blocks[i] = null;
+        }
+    }
+    
+    this.ballSpriteRect.x = this.x;
+    this.ballSpriteRect.y = this.y;
+    
+    gameTime = (gameTime <= 0) ? 15 : gameTime;
+    this.i = Math.ceil(gameTime / 1000 * 180) * (this.i / Math.abs(this.i));
+    this.j = Math.ceil(gameTime / 1000 * 120) * (this.j / Math.abs(this.j));
 };
 
 /**

@@ -24,6 +24,7 @@ game1.Game1 = function()
     
     this.ball = null;
     this.pad = null;
+    this.blocks = [];
 };
 
 // inherits from Game
@@ -42,6 +43,27 @@ game1.Game1.prototype.initialize = function()
     // TODO: Add your initialization logic here
     this.ball = new Html5Game1.Ball(0, 0);
     this.pad = new Html5Game1.Pad(350, 400);
+    
+    this.blocks.push(new Html5Game1.Block(102, 112, "#00FF00"));
+    this.blocks.push(new Html5Game1.Block(202, 112, "#00FF00"));
+    this.blocks.push(new Html5Game1.Block(302, 112, "#00FF00"));
+    this.blocks.push(new Html5Game1.Block(402, 112, "#00FF00"));
+    this.blocks.push(new Html5Game1.Block(502, 112, "#00FF00"));
+    this.blocks.push(new Html5Game1.Block(602, 112, "#00FF00"));
+    
+    this.blocks.push(new Html5Game1.Block(102, 156, "#FFFF00"));
+    this.blocks.push(new Html5Game1.Block(202, 156, "#FFFF00"));
+    this.blocks.push(new Html5Game1.Block(302, 156, "#FFFF00"));
+    this.blocks.push(new Html5Game1.Block(402, 156, "#FFFF00"));
+    this.blocks.push(new Html5Game1.Block(502, 156, "#FFFF00"));
+    this.blocks.push(new Html5Game1.Block(602, 156, "#FFFF00"));
+    
+    this.blocks.push(new Html5Game1.Block(102, 200, "#0000FF"));
+    this.blocks.push(new Html5Game1.Block(202, 200, "#0000FF"));
+    this.blocks.push(new Html5Game1.Block(302, 200, "#0000FF"));
+    this.blocks.push(new Html5Game1.Block(402, 200, "#0000FF"));
+    this.blocks.push(new Html5Game1.Block(502, 200, "#0000FF"));
+    this.blocks.push(new Html5Game1.Block(602, 200, "#0000FF"));
     
     // call function of super class
     JSXna.Framework.Game.prototype.initialize.call(this, this.graphics);
@@ -95,7 +117,7 @@ game1.Game1.prototype.update = function(gameTime)
         this.totalFrames++;
     }
     
-    this.ball.update(this.graphicsDevice, this.fps, this.pad);
+    this.ball.update(gameTime.elapsedGameTime, this.graphicsDevice, this.pad, this.blocks);
     this.pad.update(this.mouse.getState());
     
     // call function of super class
@@ -115,9 +137,16 @@ game1.Game1.prototype.draw = function(gameTime)
     this.spriteBatch.begin();
     
         // TODO: Add your drawing code here
+        this.spriteBatch.drawString("bold 12px sans-serif", "Time = " + gameTime.elapsedGameTime, [20, 20], "#FF0000");
         this.spriteBatch.drawString("bold 12px sans-serif", "FPS = " + this.fps, [730, 20], "#FF0000");
         this.ball.draw(this.spriteBatch);
         this.pad.draw(this.spriteBatch);
+        
+        for (var i = 0; i < this.blocks.length; i++)
+        {
+            if (this.blocks[i] !== null) 
+                this.blocks[i].draw(this.spriteBatch);
+        }
         
     this.spriteBatch.end();
     
