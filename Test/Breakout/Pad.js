@@ -42,9 +42,9 @@ pad.Pad.prototype.update = function(gameTime, mouseState, keyboardState)
         this.x = mouseState.x;
     }
     
-    if (keyboardState.isKeyDown(Keys.Left))
+    if (keyboardState.isKeyDown(JSXna.Keys.Left))
         this.x -= Math.ceil(gameTime / 1000 * 300);
-    if (keyboardState.isKeyDown(Keys.Right))
+    if (keyboardState.isKeyDown(JSXna.Keys.Right))
         this.x += Math.ceil(gameTime / 1000 * 300);
     
     this.padSpriteRect.x = this.x;
