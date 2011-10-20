@@ -19,7 +19,7 @@ contentManager.ContentManager = function()
  * Loads an asset that has been processed by the Content Pipeline.
  * @param assetName Asset name, relative to the loader root directory, and not 
  * including the .xnb extension
- * @return A Texture2D object
+ * @return A Texture2D object, A SoundEffect object
  */
 contentManager.ContentManager.prototype.load =
  {
@@ -35,5 +35,19 @@ contentManager.ContentManager.prototype.load =
          texture2D.image.src = assetName;
          
          return texture2D;
+     },
+     
+     SoundEffect : function(assetName)
+     {
+         var soundEffect = new JSXna.Framework.Audio.SoundEffect();
+         
+         soundEffect.audioLoaded = true;
+         
+         soundEffect.audio.src = assetName;
+         soundEffect.audio.preload = "auto";
+         
+         soundEffect.setAudioChannels();
+         
+         return soundEffect;
      }
  };

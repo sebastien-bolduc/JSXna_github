@@ -17,6 +17,8 @@ ball.Ball = function(x, y)
     this.y = y;
     this.i = 3;
     this.j = 2;
+    
+    this.soundEffect = null;
 };
 
 /**
@@ -28,6 +30,8 @@ ball.Ball.prototype.load = function(content)
 {
     this.ballSprite = content.load['Texture2D']("http://www.yocoach.ca/images/Soccer_ball.png");
     this.ballSpriteRect = new JSXna.Framework.Rectangle(this.x, this.y, 30, 30);
+    
+    this.soundEffect = content.load['SoundEffect']("http://www.ibiblio.org/pub/multimedia/pc-sounds/ding.wav");
 };
 
 /**
@@ -45,12 +49,16 @@ ball.Ball.prototype.update = function(gameTime, graphicsDevice, pad, blocks)
     
     if (this.x < 0 || this.x > (graphicsDevice.viewport.width - 30))
     {
+        this.soundEffect.play();
+        
         this.i *= -1;
         this.x += this.i * 2;
     }
     
     if (this.y < 0 || this.y > (graphicsDevice.viewport.height - 30))
     {
+        this.soundEffect.play();
+        
         this.j *= -1;
         this.y += this.j * 2;
     }
@@ -60,6 +68,8 @@ ball.Ball.prototype.update = function(gameTime, graphicsDevice, pad, blocks)
     
     if (this.ballSpriteRect.intersects(pad.padSpriteRect))
     {
+        this.soundEffect.play();
+        
         this.i *= -1;
         this.x += this.i * 2;
         this.ballSpriteRect.x = this.x;
@@ -92,6 +102,8 @@ ball.Ball.prototype.update = function(gameTime, graphicsDevice, pad, blocks)
         
         if (this.ballSpriteRect.intersects(blocks[i].blockRect))
         {
+            this.soundEffect.play();
+            
             this.i *= -1;
             this.x += this.i * 2;
             this.ballSpriteRect.x = this.x;
