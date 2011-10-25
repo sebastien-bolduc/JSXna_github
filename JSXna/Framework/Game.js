@@ -101,7 +101,7 @@ game.Game.prototype.tick = function()
 {
     // we call the game loop with "this" object
     var obj = this;
-    requestAnimFrame(function(){obj.tick();});
+    window.requestAnimFrame(function(){obj.tick();}, this.graphicsDevice.gdm.canvas);
     
     this.update(this.gameTime);
     this.draw(this.gameTime);
