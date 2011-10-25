@@ -22,4 +22,5 @@ graphicsDevice.GraphicsDevice = function(gdm)
 graphicsDevice.GraphicsDevice.prototype.clear = function()
 {
     this.gdm.bufferContext.clearRect(0, 0, this.gdm.bufferCanvas.width, this.gdm.bufferCanvas.height);
+    this.gdm.bufferContext.restore();
 };

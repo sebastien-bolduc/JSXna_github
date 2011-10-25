@@ -74,6 +74,7 @@ game.Game.prototype.draw = function(gameTime)
 {
     // double buffering
     this.graphicsDevice.gdm.context.clearRect(0 , 0, this.graphicsDevice.gdm.canvas.width, this.graphicsDevice.gdm.canvas.height);
+    this.graphicsDevice.gdm.context.restore();
     this.graphicsDevice.gdm.context.drawImage(this.graphicsDevice.gdm.bufferCanvas, 0, 0);
 };
 

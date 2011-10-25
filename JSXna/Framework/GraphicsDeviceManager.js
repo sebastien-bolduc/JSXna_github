@@ -18,4 +18,9 @@ graphicsDeviceManager.GraphicsDeviceManager = function(canvas)
     this.bufferCanvas.height = this.canvas.height;
     
     this.bufferContext = this.bufferCanvas.getContext('2d');
+    
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.context.save();
+    this.bufferContext.clearRect(0, 0, this.bufferCanvas.width, this.bufferCanvas.height);
+    this.bufferContext.save();
 };
