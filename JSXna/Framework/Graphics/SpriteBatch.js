@@ -58,13 +58,25 @@ spriteBatch.SpriteBatch.prototype.drawString = function(font, text, position, co
  * destination for drawing the sprite
  * @return 
  */
-spriteBatch.SpriteBatch.prototype.draw = function(texture2D, rectangle, source)
+spriteBatch.SpriteBatch.prototype.draw = function(texture2D, rectangle, source, rotation, origin)
 {
     if (!texture2D.imageLoaded)
         return;
     
-    if (source === undefined)
-        this.gd.gdm.bufferContext.drawImage(texture2D.image, 0, 0, texture2D.width(), texture2D.height(), rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+    this.gd.gdm.bufferContext.save();
+    this.gd.gdm.bufferContext.translate(rectangle.x, rectangle.y);
+    
+    if (rotation !== undefined && rotation !== null)
+    {
+        this.gd.gdm.bufferContext.rotate(rotation * Math.PI / 180);
+        if (origin !== undefined && origin !== null)
+            this.gd.gdm.bufferContext.translate(-origin[0], -origin[1]);
+    }
+    
+    if (source === undefined || source === null)
+        this.gd.gdm.bufferContext.drawImage(texture2D.image, 0, 0, texture2D.width(), texture2D.height(), 0, 0, rectangle.width, rectangle.height);
     else     
-        this.gd.gdm.bufferContext.drawImage(texture2D.image, source.x, source.y, source.width, source.height, rectangle.x, rectangle.y, rectangle.width, rectangle.height);
+        this.gd.gdm.bufferContext.drawImage(texture2D.image, source.x, source.y, source.width, source.height, 0, 0, rectangle.width, rectangle.height);
+    
+    this.gd.gdm.bufferContext.restore();
 };
