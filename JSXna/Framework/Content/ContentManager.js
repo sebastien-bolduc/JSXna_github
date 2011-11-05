@@ -49,5 +49,10 @@ contentManager.ContentManager.prototype.load =
          soundEffect.setAudioChannels();
          
          return soundEffect;
+     },
+     
+     Effect : function(assetName)
+     {
+         return new JSXna.Framework.Graphics.Effect();
      }
  };

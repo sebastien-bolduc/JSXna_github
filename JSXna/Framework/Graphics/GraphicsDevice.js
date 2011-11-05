@@ -30,6 +30,24 @@ graphicsDevice.GraphicsDevice.prototype.clear = function()
 };
 
 /**
+ * Apply transformation on vertex.
+ * @param vertex Vertex to be transform
+ * @return Transformed vertex
+ */
+graphicsDevice.GraphicsDevice.prototype.transform = function(vertex)
+{
+    var transformVertex = new JSXna.Framework.Graphics.VertexPositionColor(new JSXna.Framework.Vector3(), null);
+    var transformMatrix = JSXna.Framework.Graphics.BasicEffect.xWorld;
+    
+    transformVertex.position.x = (transformMatrix.m11 * vertex.position.x) + (transformMatrix.m12 * vertex.position.y) + (transformMatrix.m13 * vertex.position.z);
+    transformVertex.position.y = (transformMatrix.m21 * vertex.position.x) + (transformMatrix.m22 * vertex.position.y) + (transformMatrix.m23 * vertex.position.z);
+    transformVertex.position.z = (transformMatrix.m31 * vertex.position.x) + (transformMatrix.m32 * vertex.position.y) + (transformMatrix.m33 * vertex.position.z);
+    transformVertex.color = vertex.color;
+    
+    return transformVertex;
+};
+
+/**
  * Get the projection of a 3D point on a 2D surface.
  * @param vertex Vertex to be projected
  * @return 2D coordinate
@@ -39,7 +57,7 @@ graphicsDevice.GraphicsDevice.prototype.getProjection = function(vertex)
     var viewer = {};
     viewer.x = 0;
     viewer.y = 0;
-    viewer.z = 500;
+    viewer.z = 800;
         
     var unitX = (viewer.z * (vertex.position.x - viewer.x)) / (viewer.z + vertex.position.z) + this.gdm.canvas.width / 2;
         
@@ -73,13 +91,13 @@ graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveT
             this.gdm.bufferContext.save();
             for (var i = vertexOffset; i < primitiveCount; i++)
             {
-                unit = this.getProjection(vertexData[(i*3)]);
+                unit = this.getProjection(this.transform(vertexData[(i*3)]));
                 unit1.x = unit[0];
                 unit1.y = unit[1];
-                unit = this.getProjection(vertexData[(i*3) + 1]);
+                unit = this.getProjection(this.transform(vertexData[(i*3) + 1]));
                 unit2.x = unit[0];
                 unit2.y = unit[1];
-                unit = this.getProjection(vertexData[(i*3) + 2]);
+                unit = this.getProjection(this.transform(vertexData[(i*3) + 2]));
                 unit3.x = unit[0];
                 unit3.y = unit[1];
                 

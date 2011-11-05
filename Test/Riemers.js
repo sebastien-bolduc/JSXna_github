@@ -18,7 +18,15 @@ game1.Game1 = function()
     
     this.spriteBatch = null;
     
+    this.totalFrames = 0;
+    this.elapsedTime = 0;
+    this.fps = 0;
+    
+    this.effect = null;
+    
     this.vertices = [];
+    this.worldMatrix = null;
+    this.angle = 0;
 };
 
 // inherits from Game
@@ -52,6 +60,8 @@ game1.Game1.prototype.loadContent = function()
     this.spriteBatch = new JSXna.Framework.Graphics.SpriteBatch(this.graphicsDevice);
     
     // TODO: use this.content to load your game content here
+    this.effect = this.content.load['Effect']("effects");
+    
     this.setUpVertices();
 };
 
@@ -88,6 +98,26 @@ game1.Game1.prototype.setUpVertices = function()
 game1.Game1.prototype.update = function(gameTime)
 {
     // TODO: Add your update logic here
+    this.elapsedTime += gameTime.elapsedGameTime;
+    if (this.elapsedTime > 1000)
+    {
+        this.fps = this.totalFrames;
+        this.totalFrames = 0;
+        this.elapsedTime = 0;
+    }
+    else
+    {
+        this.totalFrames++;
+    }
+    
+    if (this.angle >= 360)
+        this.angle = 0;
+    else
+        this.angle++;
+    
+    //this.worldMatrix = new JSXna.Framework.Matrix.createRotationX(this.angle * Math.PI / 180);
+    //this.worldMatrix = new JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180);
+    this.worldMatrix = new JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180);
     
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);
@@ -106,6 +136,10 @@ game1.Game1.prototype.draw = function(gameTime)
     this.spriteBatch.begin();
     
         // TODO: Add your drawing code here
+        this.spriteBatch.drawString("bold 12px sans-serif", "Time = " + gameTime.elapsedGameTime, [20, 20], "#FF0000");
+        this.spriteBatch.drawString("bold 12px sans-serif", "FPS = " + this.fps, [730, 20], "#FF0000");
+        
+        this.effect.parameters['xWorld'](this.worldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.vertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         
     this.spriteBatch.end();
