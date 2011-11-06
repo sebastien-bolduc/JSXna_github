@@ -115,9 +115,13 @@ game1.Game1.prototype.update = function(gameTime)
     else
         this.angle++;
     
-    //this.worldMatrix = new JSXna.Framework.Matrix.createRotationX(this.angle * Math.PI / 180);
-    //this.worldMatrix = new JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180);
-    this.worldMatrix = new JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180);
+    //this.worldMatrix = JSXna.Framework.Matrix.createRotationX(this.angle * Math.PI / 180);
+    //this.worldMatrix = JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180);
+    //this.worldMatrix = JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180);
+    this.worldMatrix = JSXna.Framework.Matrix.multiply(
+        JSXna.Framework.Matrix.createTranslation(new JSXna.Framework.Vector3(this.angle - 180, 0, 0)),
+        JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180)
+        );
     
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);

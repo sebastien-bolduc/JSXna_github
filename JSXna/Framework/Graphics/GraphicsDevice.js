@@ -39,9 +39,9 @@ graphicsDevice.GraphicsDevice.prototype.transform = function(vertex)
     var transformVertex = new JSXna.Framework.Graphics.VertexPositionColor(new JSXna.Framework.Vector3(), null);
     var transformMatrix = JSXna.Framework.Graphics.BasicEffect.xWorld;
     
-    transformVertex.position.x = (transformMatrix.m11 * vertex.position.x) + (transformMatrix.m12 * vertex.position.y) + (transformMatrix.m13 * vertex.position.z);
-    transformVertex.position.y = (transformMatrix.m21 * vertex.position.x) + (transformMatrix.m22 * vertex.position.y) + (transformMatrix.m23 * vertex.position.z);
-    transformVertex.position.z = (transformMatrix.m31 * vertex.position.x) + (transformMatrix.m32 * vertex.position.y) + (transformMatrix.m33 * vertex.position.z);
+    transformVertex.position.x = (transformMatrix.m11 * vertex.position.x) + (transformMatrix.m12 * vertex.position.y) + (transformMatrix.m13 * vertex.position.z) + transformMatrix.m14;
+    transformVertex.position.y = (transformMatrix.m21 * vertex.position.x) + (transformMatrix.m22 * vertex.position.y) + (transformMatrix.m23 * vertex.position.z) + transformMatrix.m24;
+    transformVertex.position.z = (transformMatrix.m31 * vertex.position.x) + (transformMatrix.m32 * vertex.position.y) + (transformMatrix.m33 * vertex.position.z) + transformMatrix.m34;
     transformVertex.color = vertex.color;
     
     return transformVertex;
