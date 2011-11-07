@@ -31,10 +31,10 @@ matrix.Matrix = function(m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, 
 };
 
 /**
- * Multiply two matrix together. 
- * @param matrix1 Frist matrix
- * @param matrix2 Second matrix
- * @return The product of two matrix
+ * Multiplies a matrix by another matrix. 
+ * @param matrix1 Source matrix
+ * @param matrix2 Source matrix
+ * @return Result of the multiplication
  */
 matrix.Matrix.multiply = function(matrix1, matrix2)
 {
@@ -112,4 +112,14 @@ matrix.Matrix.createRotationZ = function(radians)
 matrix.Matrix.createTranslation = function(position)
 {
     return new JSXna.Framework.Matrix(1, 0, 0, position.x, 0, 1, 0, position.y, 0 , 0 , 1, position.z, 0 , 0, 0, 1);
+};
+
+/**
+ * Creates a scaling Matrix.
+ * @param scales Amounts to scale by on the x, y, and z axes
+ * @return The created scaling Matrix
+ */
+matrix.Matrix.createScale = function(scales)
+{
+    return new JSXna.Framework.Matrix(scales.x, 0, 0, 0, 0, scales.y, 0, 0, 0, 0, scales.z, 0, 0, 0, 0, 1);
 };

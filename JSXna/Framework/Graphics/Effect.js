@@ -22,8 +22,16 @@ effect.Effect = function()
  */
 effect.Effect.prototype.parameters =
 {
-    xWorld : function(value)
+    /*xWorld : function(value)
     {
         JSXna.Framework.Graphics.BasicEffect.xWorld = value;
+    }*/
+    
+    xWorld :
+    {
+        setValue : function(value)
+        {
+            JSXna.Framework.Graphics.BasicEffect.xWorld = value;
+        }
     }
 };

@@ -115,12 +115,12 @@ game1.Game1.prototype.update = function(gameTime)
     else
         this.angle++;
     
-    //this.worldMatrix = JSXna.Framework.Matrix.createRotationX(this.angle * Math.PI / 180);
-    //this.worldMatrix = JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180);
-    //this.worldMatrix = JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180);
     this.worldMatrix = JSXna.Framework.Matrix.multiply(
-        JSXna.Framework.Matrix.createTranslation(new JSXna.Framework.Vector3(this.angle - 180, 0, 0)),
-        JSXna.Framework.Matrix.createRotationZ(this.angle * Math.PI / 180)
+        JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180),
+        JSXna.Framework.Matrix.multiply(
+            JSXna.Framework.Matrix.createTranslation(new JSXna.Framework.Vector3(200, 0, 0)),
+            JSXna.Framework.Matrix.createScale(new JSXna.Framework.Vector3(0.5, 0.5, 0.5))
+            )
         );
     
     // call function of super class
@@ -143,7 +143,7 @@ game1.Game1.prototype.draw = function(gameTime)
         this.spriteBatch.drawString("bold 12px sans-serif", "Time = " + gameTime.elapsedGameTime, [20, 20], "#FF0000");
         this.spriteBatch.drawString("bold 12px sans-serif", "FPS = " + this.fps, [730, 20], "#FF0000");
         
-        this.effect.parameters['xWorld'](this.worldMatrix);
+        this.effect.parameters['xWorld'].setValue(this.worldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.vertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         
     this.spriteBatch.end();
