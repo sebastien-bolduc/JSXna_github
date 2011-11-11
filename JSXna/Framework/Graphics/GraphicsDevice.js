@@ -39,12 +39,120 @@ graphicsDevice.GraphicsDevice.prototype.transform = function(vertex)
     var transformVertex = new JSXna.Framework.Graphics.VertexPositionColor(new JSXna.Framework.Vector3(), null);
     var transformMatrix = JSXna.Framework.Graphics.BasicEffect.xWorld;
     
-    transformVertex.position.x = (transformMatrix.m11 * vertex.position.x) + (transformMatrix.m12 * vertex.position.y) + (transformMatrix.m13 * vertex.position.z) + transformMatrix.m14;
-    transformVertex.position.y = (transformMatrix.m21 * vertex.position.x) + (transformMatrix.m22 * vertex.position.y) + (transformMatrix.m23 * vertex.position.z) + transformMatrix.m24;
-    transformVertex.position.z = (transformMatrix.m31 * vertex.position.x) + (transformMatrix.m32 * vertex.position.y) + (transformMatrix.m33 * vertex.position.z) + transformMatrix.m34;
+    transformVertex.position.x = (transformMatrix.m11 * vertex.position.x) + (transformMatrix.m12 * vertex.position.y) + (transformMatrix.m13 * vertex.position.z) + (transformMatrix.m14 * vertex.position.w);
+    transformVertex.position.y = (transformMatrix.m21 * vertex.position.x) + (transformMatrix.m22 * vertex.position.y) + (transformMatrix.m23 * vertex.position.z) + (transformMatrix.m24 * vertex.position.w);
+    transformVertex.position.z = (transformMatrix.m31 * vertex.position.x) + (transformMatrix.m32 * vertex.position.y) + (transformMatrix.m33 * vertex.position.z) + (transformMatrix.m34 * vertex.position.w);
     transformVertex.color = vertex.color;
     
     return transformVertex;
+};
+
+/**
+ * Take care of clipping a triangle against a define plane in space.
+ * @param vertexData Our vertex data to compute
+ * @param planeNormal Normal of plane (must be normalized)
+ * @param planeDistance Distance of plane from ogirin
+ * @param side Side of clipping ( + | -)
+ * @return New set of vertex data
+ */
+graphicsDevice.GraphicsDevice.prototype.applyClippingPlane = function(vertexData, planeNormal, planeDistance, side)
+{
+    var clippingPlaneX = planeDistance;
+    var newVertexData = [];
+    
+    function distanceToPlane(P)
+    {
+        return JSXna.Framework.Vector3.dot(P.position, planeNormal) - planeDistance;
+    }
+    
+    function intersectionFactor(P1, P2)
+    {
+        var distance1 = distanceToPlane(P1);
+        var distance2 = distanceToPlane(P2);
+        
+        return distance1 / (distance1 - distance2);
+    }
+    
+    function intersectionLinePlane(P1, P2)
+    {
+        var s = intersectionFactor(P1, P2);
+        
+        return new JSXna.Framework.Graphics.VertexPositionColor(
+            new JSXna.Framework.Vector3(
+                P1.position.x + s * (P2.position.x - P1.position.x),
+                P1.position.y + s * (P2.position.y - P1.position.y),
+                P1.position.z + s * (P2.position.z - P1.position.z)
+                ),
+                P1.color
+            );
+    }
+    
+    // --------------------------------------------------------------------------
+    
+    if ((distanceToPlane(vertexData[0]) * side) < 0)
+    {
+        if ((distanceToPlane(vertexData[1]) * side) < 0)
+            newVertexData.push(vertexData[1]);
+        else
+        {
+            newVertexData.push(intersectionLinePlane(vertexData[0], vertexData[1]));
+        }
+    }
+    else
+    {
+        if ((distanceToPlane(vertexData[1]) * side) < 0)
+        {
+            newVertexData.push(vertexData[1]);
+            newVertexData.push(intersectionLinePlane(vertexData[0], vertexData[1]));
+        }
+    }
+    
+    // --------------------------------------------------------------------------
+    
+    if ((distanceToPlane(vertexData[1]) * side) < 0)
+    {
+        if ((distanceToPlane(vertexData[2]) * side) < 0)
+            newVertexData.push(vertexData[2]);
+        else
+        {
+            newVertexData.push(intersectionLinePlane(vertexData[1], vertexData[2]));
+        }
+    }
+    else
+    {
+        if ((distanceToPlane(vertexData[2]) * side) < 0)
+        {
+            newVertexData.push(vertexData[2]);
+            newVertexData.push(intersectionLinePlane(vertexData[1], vertexData[2]));
+        }
+    }
+    
+    // --------------------------------------------------------------------------
+    
+    if ((distanceToPlane(vertexData[2]) * side) < 0)
+    {
+        if ((distanceToPlane(vertexData[0]) * side) < 0)
+            newVertexData.push(vertexData[0]);
+        else
+        {
+            newVertexData.push(intersectionLinePlane(vertexData[2], vertexData[0]));
+        }
+    }
+    else
+    {
+        if ((distanceToPlane(vertexData[0]) * side) < 0)
+        {
+            newVertexData.push(vertexData[0]);
+            newVertexData.push(intersectionLinePlane(vertexData[2], vertexData[0]));
+        }
+    }
+    
+    if (newVertexData.length > 3)
+        return [newVertexData[0], newVertexData[1], newVertexData[2], newVertexData[1], newVertexData[2], newVertexData[3]];
+    else if (newVertexData.length == 3)
+        return [newVertexData[0], newVertexData[1], newVertexData[2]];
+    else 
+        return [];
 };
 
 /**
@@ -77,10 +185,17 @@ graphicsDevice.GraphicsDevice.prototype.getProjection = function(vertex)
  */
 graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveType, vertexData, vertexOffset, primitiveCount, vertexDeclaration)
 {
+    var transformVertexData = [];
+    var clippedVertexData = [];
+    var clippedPrimitiveCount = 0;
+    
     var unit;
     var unit1 = {};
     var unit2 = {};
     var unit3 = {};
+    
+    //var newVertexData = this.applyClippingPlane(vertexData, new JSXna.Framework.Vector3(1, 0, 0), 100, 1);
+    //var newPrimitiveCount = newVertexData.length / 3;
     
     switch (primitiveType)
     {
@@ -89,20 +204,31 @@ graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveT
             break;
         default:
             this.gdm.bufferContext.save();
+            
             for (var i = vertexOffset; i < primitiveCount; i++)
             {
-                unit = this.getProjection(this.transform(vertexData[(i*3)]));
+                transformVertexData.push(this.transform(vertexData[(i*3)]));
+                transformVertexData.push(this.transform(vertexData[(i*3) + 1]));
+                transformVertexData.push(this.transform(vertexData[(i*3) + 2]));
+            }
+            
+            clippedVertexData = this.applyClippingPlane(transformVertexData, new JSXna.Framework.Vector3(1, 0, 0), -200, -1);
+            clippedPrimitiveCount = clippedVertexData.length / 3;
+            
+            for (var i = vertexOffset; i < clippedPrimitiveCount; i++)
+            {
+                unit = this.getProjection(clippedVertexData[(i*3)]);
                 unit1.x = unit[0];
                 unit1.y = unit[1];
-                unit = this.getProjection(this.transform(vertexData[(i*3) + 1]));
+                unit = this.getProjection(clippedVertexData[(i*3) + 1]);
                 unit2.x = unit[0];
                 unit2.y = unit[1];
-                unit = this.getProjection(this.transform(vertexData[(i*3) + 2]));
+                unit = this.getProjection(clippedVertexData[(i*3) + 2]);
                 unit3.x = unit[0];
                 unit3.y = unit[1];
                 
-                this.gdm.bufferContext.fillStyle = vertexData[(i*3)].color;
-                this.gdm.bufferContext.strokeStyle = vertexData[(i*3)].color;
+                this.gdm.bufferContext.fillStyle = clippedVertexData[(i*3)].color;
+                this.gdm.bufferContext.strokeStyle = clippedVertexData[(i*3)].color;
                 this.gdm.bufferContext.beginPath();
                 this.gdm.bufferContext.moveTo(unit1.x, unit1.y);
                 this.gdm.bufferContext.lineTo(unit2.x, unit2.y);

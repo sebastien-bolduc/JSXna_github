@@ -14,6 +14,7 @@ vector3.Vector3 = function(x, y, z)
     this.x = x;
     this.y = y;
     this.z = z;
+    this.w = 1;
 };
 
 /**
