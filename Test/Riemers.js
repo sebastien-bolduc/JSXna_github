@@ -27,6 +27,9 @@ game1.Game1 = function()
     this.vertices = [];
     this.worldMatrix = null;
     this.angle = 0;
+    
+    this.BTvertices = [];
+    this.BTworldMatrix = null;
 };
 
 // inherits from Game
@@ -63,6 +66,7 @@ game1.Game1.prototype.loadContent = function()
     this.effect = this.content.load['Effect']("effects");
     
     this.setUpVertices();
+    this.BTsetUpVertices();
 };
 
 /**
@@ -87,6 +91,19 @@ game1.Game1.prototype.setUpVertices = function()
     this.vertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
     this.vertices[2].position = new JSXna.Framework.Vector3(200, 100, 0);
     this.vertices[2].color = "#000000";
+};
+
+game1.Game1.prototype.BTsetUpVertices = function()
+{
+    this.BTvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.BTvertices[0].position = new JSXna.Framework.Vector3(0, -100, 0);
+    this.BTvertices[0].color = "#0000FF";
+    this.BTvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.BTvertices[1].position = new JSXna.Framework.Vector3(-200, 100, 0);
+    this.BTvertices[1].color = "#0000FF";
+    this.BTvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.BTvertices[2].position = new JSXna.Framework.Vector3(200, 100, 0);
+    this.BTvertices[2].color = "#0000FF";
 };
 
 /**
@@ -122,6 +139,8 @@ game1.Game1.prototype.update = function(gameTime)
             JSXna.Framework.Matrix.createScale(new JSXna.Framework.Vector3(0.5, 0.5, 0.5))
             )
         );
+        
+    this.BTworldMatrix = JSXna.Framework.Matrix.createScale(new JSXna.Framework.Vector3(0.5, 0.5, 0.5));
     
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);
@@ -145,6 +164,8 @@ game1.Game1.prototype.draw = function(gameTime)
         
         this.effect.parameters['xWorld'].setValue(this.worldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.vertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
+        this.effect.parameters['xWorld'].setValue(this.BTworldMatrix);
+        this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.BTvertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         
     this.spriteBatch.end();
     

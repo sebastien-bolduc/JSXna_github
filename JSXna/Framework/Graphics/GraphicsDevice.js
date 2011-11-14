@@ -5,6 +5,9 @@ graphicsDevice.PrimitiveType = {};
 graphicsDevice.PrimitiveType.TriangleList = 0;
 graphicsDevice.PrimitiveType.TriangleStrip = 1;
 
+graphicsDevice.ContentPipeline = {};
+graphicsDevice.ContentPipeline.VertexData = [];
+
 /**
  * Creates an instance of this object.
  * @param gdm Graphics device manager
@@ -27,6 +30,8 @@ graphicsDevice.GraphicsDevice.prototype.clear = function()
 {
     this.gdm.bufferContext.clearRect(0, 0, this.gdm.bufferCanvas.width, this.gdm.bufferCanvas.height);
     this.gdm.bufferContext.restore();
+    
+    JSXna.Framework.Graphics.ContentPipeline.VertexData = [];
 };
 
 /**
@@ -55,14 +60,13 @@ graphicsDevice.GraphicsDevice.prototype.transform = function(vertex)
  * @param side Side of clipping ( + | -)
  * @return New set of vertex data
  */
-graphicsDevice.GraphicsDevice.prototype.applyClippingPlane = function(vertexData, planeNormal, planeDistance, side)
+graphicsDevice.GraphicsDevice.prototype.applyClippingPlane = function(vertexData, plane, side)
 {
-    var clippingPlaneX = planeDistance;
     var newVertexData = [];
     
     function distanceToPlane(P)
     {
-        return JSXna.Framework.Vector3.dot(P.position, planeNormal) - planeDistance;
+        return plane.dotNormal(P.position) - plane.d;
     }
     
     function intersectionFactor(P1, P2)
@@ -87,72 +91,72 @@ graphicsDevice.GraphicsDevice.prototype.applyClippingPlane = function(vertexData
             );
     }
     
-    // --------------------------------------------------------------------------
-    
-    if ((distanceToPlane(vertexData[0]) * side) < 0)
+    for (var i = 0; i < (vertexData.length / 3); i++)
     {
-        if ((distanceToPlane(vertexData[1]) * side) < 0)
-            newVertexData.push(vertexData[1]);
-        else
+        for (var j = 0; j < 3; j++)
         {
-            newVertexData.push(intersectionLinePlane(vertexData[0], vertexData[1]));
+            if ((distanceToPlane(vertexData[(i * 3) + j]) * side) < 0)
+            {
+                if ((distanceToPlane(vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]) * side) < 0)
+                    newVertexData.push(vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]);
+                else
+                {
+                    newVertexData.push(intersectionLinePlane(vertexData[(i * 3) + j], vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]));
+                }
+            }
+            else
+            {
+                if ((distanceToPlane(vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]) * side) < 0)
+                {
+                    newVertexData.push(intersectionLinePlane(vertexData[(i * 3) + j], vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]));
+                    newVertexData.push(vertexData[(j == 2) ? (i * 3) : ((i * 3) + j + 1)]);
+                }
+            }
         }
-    }
-    else
-    {
-        if ((distanceToPlane(vertexData[1]) * side) < 0)
+        
+        if ((newVertexData.length % 3) !== 0)
         {
-            newVertexData.push(vertexData[1]);
-            newVertexData.push(intersectionLinePlane(vertexData[0], vertexData[1]));
-        }
-    }
-    
-    // --------------------------------------------------------------------------
-    
-    if ((distanceToPlane(vertexData[1]) * side) < 0)
-    {
-        if ((distanceToPlane(vertexData[2]) * side) < 0)
-            newVertexData.push(vertexData[2]);
-        else
-        {
-            newVertexData.push(intersectionLinePlane(vertexData[1], vertexData[2]));
-        }
-    }
-    else
-    {
-        if ((distanceToPlane(vertexData[2]) * side) < 0)
-        {
-            newVertexData.push(vertexData[2]);
-            newVertexData.push(intersectionLinePlane(vertexData[1], vertexData[2]));
+            newVertexData.push(newVertexData[newVertexData.length - 2]);
+            newVertexData.push(newVertexData[0]);
         }
     }
     
-    // --------------------------------------------------------------------------
+    return newVertexData;
+};
+
+/**
+ * Some primitive Z-buffering base on triangle.
+ * @param vertexData Triangles (vertex) to apply Z-bufferring to
+ * @return New set of Z-buffered vertex data
+ */
+graphicsDevice.GraphicsDevice.prototype.applyZbuffer = function(vertexData)
+{
+    var newVertexData = [];
+    var Zbuffer = [];
+    var currentDepth = 10000;
     
-    if ((distanceToPlane(vertexData[2]) * side) < 0)
+    for (var i = 0; i < (vertexData.length / 3); i++)
     {
-        if ((distanceToPlane(vertexData[0]) * side) < 0)
-            newVertexData.push(vertexData[0]);
-        else
+        currentDepth = 0;
+        
+        for (var j = 0; j < 3; j++)
         {
-            newVertexData.push(intersectionLinePlane(vertexData[2], vertexData[0]));
+            currentDepth = (vertexData[(i * 3) + j].position.z < currentDepth) ? vertexData[(i * 3) + j].position.z : currentDepth;
         }
-    }
-    else
-    {
-        if ((distanceToPlane(vertexData[0]) * side) < 0)
-        {
-            newVertexData.push(vertexData[0]);
-            newVertexData.push(intersectionLinePlane(vertexData[2], vertexData[0]));
-        }
+        
+        Zbuffer.push([i, currentDepth]);
     }
     
-    if (newVertexData.length > 3)
-        return [newVertexData[0], newVertexData[1], newVertexData[2], newVertexData[1], newVertexData[2], newVertexData[3]];
-    else if (newVertexData.length == 3)
-        return [newVertexData[0], newVertexData[1], newVertexData[2]];
-    else 
-        return [];
+    Zbuffer.sort(function(a, b) { return b[1] - a[1]; });
+    
+    for (i = 0; i < Zbuffer.length; i++)
+    {
+        newVertexData.push(vertexData[Zbuffer[i][0] * 3]);
+        newVertexData.push(vertexData[(Zbuffer[i][0] * 3) + 1]);
+        newVertexData.push(vertexData[(Zbuffer[i][0] * 3) + 2]);
+    }
+    
+    return newVertexData;
 };
 
 /**
@@ -189,13 +193,44 @@ graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveT
     var clippedVertexData = [];
     var clippedPrimitiveCount = 0;
     
+    switch (primitiveType)
+    {
+        case 1:
+            alert("test");
+            break;
+        default:
+            for (var i = vertexOffset; i < primitiveCount; i++)
+            {
+                transformVertexData.push(this.transform(vertexData[(i*3)]));
+                transformVertexData.push(this.transform(vertexData[(i*3) + 1]));
+                transformVertexData.push(this.transform(vertexData[(i*3) + 2]));
+            }
+            
+            clippedVertexData = this.applyClippingPlane(transformVertexData, new JSXna.Framework.Plane(new JSXna.Framework.Vector3(1, 0, 0), -200), -1);
+            clippedVertexData = this.applyClippingPlane(clippedVertexData, new JSXna.Framework.Plane(new JSXna.Framework.Vector3(1, 0, 0), 200), 1);
+            clippedPrimitiveCount = clippedVertexData.length / 3;
+            
+            JSXna.Framework.Graphics.ContentPipeline.VertexData = JSXna.Framework.Graphics.ContentPipeline.VertexData.concat(clippedVertexData);
+    }
+};
+
+/**
+ * Renders geometric primitives from the content pipeline. 
+ * @param primitiveType Describes the type of primitive to render.
+ * @param vertexData The vertex data.
+ * @param vertexOffset Offset (in vertices) from the beginning of the buffer to start reading data.
+ * @param primitiveCount Number of primitives to render.
+ * @param vertexDeclaration The vertex declaration, which defines per-vertex data.
+ * @return 
+ */
+graphicsDevice.GraphicsDevice.prototype.drawContentPipeline = function(primitiveType, vertexData, vertexOffset, primitiveCount, vertexDeclaration)
+{
+    var ZbufferVertexData = [];
+    
     var unit;
     var unit1 = {};
     var unit2 = {};
     var unit3 = {};
-    
-    //var newVertexData = this.applyClippingPlane(vertexData, new JSXna.Framework.Vector3(1, 0, 0), 100, 1);
-    //var newPrimitiveCount = newVertexData.length / 3;
     
     switch (primitiveType)
     {
@@ -205,30 +240,22 @@ graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveT
         default:
             this.gdm.bufferContext.save();
             
-            for (var i = vertexOffset; i < primitiveCount; i++)
-            {
-                transformVertexData.push(this.transform(vertexData[(i*3)]));
-                transformVertexData.push(this.transform(vertexData[(i*3) + 1]));
-                transformVertexData.push(this.transform(vertexData[(i*3) + 2]));
-            }
+            ZbufferVertexData = this.applyZbuffer(vertexData);
             
-            clippedVertexData = this.applyClippingPlane(transformVertexData, new JSXna.Framework.Vector3(1, 0, 0), -200, -1);
-            clippedPrimitiveCount = clippedVertexData.length / 3;
-            
-            for (var i = vertexOffset; i < clippedPrimitiveCount; i++)
+            for (i = vertexOffset; i < primitiveCount; i++)
             {
-                unit = this.getProjection(clippedVertexData[(i*3)]);
+                unit = this.getProjection(ZbufferVertexData[(i*3)]);
                 unit1.x = unit[0];
                 unit1.y = unit[1];
-                unit = this.getProjection(clippedVertexData[(i*3) + 1]);
+                unit = this.getProjection(ZbufferVertexData[(i*3) + 1]);
                 unit2.x = unit[0];
                 unit2.y = unit[1];
-                unit = this.getProjection(clippedVertexData[(i*3) + 2]);
+                unit = this.getProjection(ZbufferVertexData[(i*3) + 2]);
                 unit3.x = unit[0];
                 unit3.y = unit[1];
                 
-                this.gdm.bufferContext.fillStyle = clippedVertexData[(i*3)].color;
-                this.gdm.bufferContext.strokeStyle = clippedVertexData[(i*3)].color;
+                this.gdm.bufferContext.fillStyle = ZbufferVertexData[(i*3)].color;
+                this.gdm.bufferContext.strokeStyle = ZbufferVertexData[(i*3)].color;
                 this.gdm.bufferContext.beginPath();
                 this.gdm.bufferContext.moveTo(unit1.x, unit1.y);
                 this.gdm.bufferContext.lineTo(unit2.x, unit2.y);

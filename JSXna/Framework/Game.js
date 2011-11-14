@@ -72,6 +72,14 @@ game.Game.prototype.update = function(gameTime)
  */
 game.Game.prototype.draw = function(gameTime)
 {
+    this.graphicsDevice.drawContentPipeline(
+            JSXna.Framework.Graphics.PrimitiveType.TriangleList, 
+            JSXna.Framework.Graphics.ContentPipeline.VertexData, 
+            0, 
+            JSXna.Framework.Graphics.ContentPipeline.VertexData.length / 3, 
+            JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration
+            );
+    
     // double buffering
     this.graphicsDevice.gdm.context.clearRect(0 , 0, this.graphicsDevice.gdm.canvas.width, this.graphicsDevice.gdm.canvas.height);
     this.graphicsDevice.gdm.context.restore();
