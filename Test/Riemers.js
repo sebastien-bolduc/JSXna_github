@@ -30,6 +30,9 @@ game1.Game1 = function()
     
     this.BTvertices = [];
     this.BTworldMatrix = null;
+    
+    this.Fvertices = [];
+    this.FworldMatrix = null;
 };
 
 // inherits from Game
@@ -67,6 +70,7 @@ game1.Game1.prototype.loadContent = function()
     
     this.setUpVertices();
     this.BTsetUpVertices();
+    this.FsetUpVertices();
 };
 
 /**
@@ -106,6 +110,29 @@ game1.Game1.prototype.BTsetUpVertices = function()
     this.BTvertices[2].color = "#0000FF";
 };
 
+game1.Game1.prototype.FsetUpVertices = function()
+{
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[0].position = new JSXna.Framework.Vector3(-400, 51, -2000);
+    this.Fvertices[0].color = "#00FF00";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[1].position = new JSXna.Framework.Vector3(-400, 51, 2000);
+    this.Fvertices[1].color = "#00FF00";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[2].position = new JSXna.Framework.Vector3(400, 51, 2000);
+    this.Fvertices[2].color = "#00FF00";
+    
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[3].position = new JSXna.Framework.Vector3(400, 51, 2000);
+    this.Fvertices[3].color = "#00FF00";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[4].position = new JSXna.Framework.Vector3(-400, 51, -2000);
+    this.Fvertices[4].color = "#00FF00";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[5].position = new JSXna.Framework.Vector3(400, 51, -2000);
+    this.Fvertices[5].color = "#00FF00";
+};
+
 /**
  * Allows the game to run logic such as updating the world, checking for 
  * collisions, gathering input, and playing audio.
@@ -142,6 +169,8 @@ game1.Game1.prototype.update = function(gameTime)
         
     this.BTworldMatrix = JSXna.Framework.Matrix.createScale(new JSXna.Framework.Vector3(0.5, 0.5, 0.5));
     
+    this.FworldMatrix = JSXna.Framework.Matrix.identity();
+    
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);
 };
@@ -166,6 +195,8 @@ game1.Game1.prototype.draw = function(gameTime)
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.vertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         this.effect.parameters['xWorld'].setValue(this.BTworldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.BTvertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
+        this.effect.parameters['xWorld'].setValue(this.FworldMatrix);
+        this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.Fvertices, 0, 2, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         
     this.spriteBatch.end();
     

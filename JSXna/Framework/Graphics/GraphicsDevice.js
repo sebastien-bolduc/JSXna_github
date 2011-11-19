@@ -55,8 +55,7 @@ graphicsDevice.GraphicsDevice.prototype.transform = function(vertex)
 /**
  * Take care of clipping a triangle against a define plane in space.
  * @param vertexData Our vertex data to compute
- * @param planeNormal Normal of plane (must be normalized)
- * @param planeDistance Distance of plane from ogirin
+ * @param plane Clipping plane
  * @param side Side of clipping ( + | -)
  * @return New set of vertex data
  */
@@ -117,9 +116,39 @@ graphicsDevice.GraphicsDevice.prototype.applyClippingPlane = function(vertexData
         if ((newVertexData.length % 3) !== 0)
         {
             newVertexData.push(newVertexData[newVertexData.length - 2]);
-            newVertexData.push(newVertexData[0]);
+            newVertexData.push(newVertexData[newVertexData.length - 5]);
         }
     }
+    
+    return newVertexData;
+};
+
+/**
+ * Define a basic frustnum relative to our viewing area.
+ * @param vertexData Triangles (vertex) to apply "frustnuming" to
+ * @return New set of frustnum vertex data
+ */
+graphicsDevice.GraphicsDevice.prototype.applyFrustnum = function(vertexData)
+{
+    var newVertexData = [];
+    
+    var horizontalAngle = Math.atan2(this.gdm.bufferCanvas.width / 2, 800);
+    var verticalAngle = Math.atan2(this.gdm.bufferCanvas.height / 2, 800);
+    var sh = Math.sin(horizontalAngle);
+    var sv = Math.sin(verticalAngle);
+    var ch = Math.cos(horizontalAngle);
+    var cv = Math.cos(verticalAngle);
+    
+    // left
+    newVertexData = this.applyClippingPlane(vertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(ch, 0, sh)), -300), -1);
+    // right
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(-ch, 0, sh)), -300), -1);
+    // top
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, cv, sv)), -300), -1);
+    // bottom
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, -cv, sv)), -300), -1);
+    // near
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, 0, -1)), 500), 1);
     
     return newVertexData;
 };
@@ -133,15 +162,15 @@ graphicsDevice.GraphicsDevice.prototype.applyZbuffer = function(vertexData)
 {
     var newVertexData = [];
     var Zbuffer = [];
-    var currentDepth = 10000;
+    var currentDepth = -10000;
     
     for (var i = 0; i < (vertexData.length / 3); i++)
     {
-        currentDepth = 0;
+        currentDepth = -10000;
         
         for (var j = 0; j < 3; j++)
         {
-            currentDepth = (vertexData[(i * 3) + j].position.z < currentDepth) ? vertexData[(i * 3) + j].position.z : currentDepth;
+            currentDepth = (vertexData[(i * 3) + j].position.z > currentDepth) ? vertexData[(i * 3) + j].position.z : currentDepth;
         }
         
         Zbuffer.push([i, currentDepth]);
@@ -190,8 +219,7 @@ graphicsDevice.GraphicsDevice.prototype.getProjection = function(vertex)
 graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveType, vertexData, vertexOffset, primitiveCount, vertexDeclaration)
 {
     var transformVertexData = [];
-    var clippedVertexData = [];
-    var clippedPrimitiveCount = 0;
+    var frustnumVertexData = [];
     
     switch (primitiveType)
     {
@@ -206,11 +234,9 @@ graphicsDevice.GraphicsDevice.prototype.drawUserPrimitives = function(primitiveT
                 transformVertexData.push(this.transform(vertexData[(i*3) + 2]));
             }
             
-            clippedVertexData = this.applyClippingPlane(transformVertexData, new JSXna.Framework.Plane(new JSXna.Framework.Vector3(1, 0, 0), -200), -1);
-            clippedVertexData = this.applyClippingPlane(clippedVertexData, new JSXna.Framework.Plane(new JSXna.Framework.Vector3(1, 0, 0), 200), 1);
-            clippedPrimitiveCount = clippedVertexData.length / 3;
+            frustnumVertexData = this.applyFrustnum(transformVertexData);
             
-            JSXna.Framework.Graphics.ContentPipeline.VertexData = JSXna.Framework.Graphics.ContentPipeline.VertexData.concat(clippedVertexData);
+            JSXna.Framework.Graphics.ContentPipeline.VertexData = JSXna.Framework.Graphics.ContentPipeline.VertexData.concat(frustnumVertexData);
     }
 };
 
