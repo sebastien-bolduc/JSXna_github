@@ -33,6 +33,9 @@ game1.Game1 = function()
     
     this.Fvertices = [];
     this.FworldMatrix = null;
+    
+    this.viewMatrix = null;
+    this.cameraAngle = 0;
 };
 
 // inherits from Game
@@ -113,24 +116,54 @@ game1.Game1.prototype.BTsetUpVertices = function()
 game1.Game1.prototype.FsetUpVertices = function()
 {
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[0].position = new JSXna.Framework.Vector3(-400, 51, -2000);
+    this.Fvertices[0].position = new JSXna.Framework.Vector3(0, 51, -800);
     this.Fvertices[0].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[1].position = new JSXna.Framework.Vector3(-400, 51, 2000);
+    this.Fvertices[1].position = new JSXna.Framework.Vector3(-1600, 51, 800);
     this.Fvertices[1].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[2].position = new JSXna.Framework.Vector3(400, 51, 2000);
+    this.Fvertices[2].position = new JSXna.Framework.Vector3(0, 51, 800);
     this.Fvertices[2].color = "#00FF00";
     
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[3].position = new JSXna.Framework.Vector3(400, 51, 2000);
+    this.Fvertices[3].position = new JSXna.Framework.Vector3(0, 51, -800);
     this.Fvertices[3].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[4].position = new JSXna.Framework.Vector3(-400, 51, -2000);
+    this.Fvertices[4].position = new JSXna.Framework.Vector3(1600, 51, 800);
     this.Fvertices[4].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[5].position = new JSXna.Framework.Vector3(400, 51, -2000);
+    this.Fvertices[5].position = new JSXna.Framework.Vector3(0, 51, 800);
     this.Fvertices[5].color = "#00FF00";
+    
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[6].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[6].color = "#FF0000";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[7].position = new JSXna.Framework.Vector3(1600, 51, 800);
+    this.Fvertices[7].color = "#FF0000";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[8].position = new JSXna.Framework.Vector3(1600, 51, -2400);
+    this.Fvertices[8].color = "#FF0000";
+    
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[9].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[9].color = "#0000FF";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[10].position = new JSXna.Framework.Vector3(-1600, 51, 800);
+    this.Fvertices[10].color = "#0000FF";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[11].position = new JSXna.Framework.Vector3(-1600, 51, -2400);
+    this.Fvertices[11].color = "#0000FF";
+    
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[12].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[12].color = "#000000";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[13].position = new JSXna.Framework.Vector3(-1600, 51, -2400);
+    this.Fvertices[13].color = "#000000";
+    this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
+    this.Fvertices[14].position = new JSXna.Framework.Vector3(1600, 51, -2400);
+    this.Fvertices[14].color = "#000000";
 };
 
 /**
@@ -158,6 +191,11 @@ game1.Game1.prototype.update = function(gameTime)
         this.angle = 0;
     else
         this.angle++;
+        
+    if (this.cameraAngle >= 360)
+        this.cameraAngle = 0;
+    else
+        this.cameraAngle += 0.2;
     
     this.worldMatrix = JSXna.Framework.Matrix.multiply(
         JSXna.Framework.Matrix.createRotationY(this.angle * Math.PI / 180),
@@ -170,7 +208,16 @@ game1.Game1.prototype.update = function(gameTime)
     this.BTworldMatrix = JSXna.Framework.Matrix.createScale(new JSXna.Framework.Vector3(0.5, 0.5, 0.5));
     
     this.FworldMatrix = JSXna.Framework.Matrix.identity();
-    
+  
+    this.viewMatrix = JSXna.Framework.Matrix.multiply(
+        JSXna.Framework.Matrix.createTranslation(new JSXna.Framework.Vector3(0, 0, -800)),
+        //JSXna.Framework.Matrix.identity(),
+        JSXna.Framework.Matrix.multiply(
+            JSXna.Framework.Matrix.createRotationY(this.cameraAngle * Math.PI / 180),
+            JSXna.Framework.Matrix.createTranslation(new JSXna.Framework.Vector3(0, 0, 800))
+            )
+        );
+  
     // call function of super class
     JSXna.Framework.Game.prototype.update.call(this, gameTime);
 };
@@ -191,12 +238,13 @@ game1.Game1.prototype.draw = function(gameTime)
         this.spriteBatch.drawString("bold 12px sans-serif", "Time = " + gameTime.elapsedGameTime, [20, 20], "#FF0000");
         this.spriteBatch.drawString("bold 12px sans-serif", "FPS = " + this.fps, [730, 20], "#FF0000");
         
+        this.effect.parameters['xView'].setValue(this.viewMatrix);
         this.effect.parameters['xWorld'].setValue(this.worldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.vertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         this.effect.parameters['xWorld'].setValue(this.BTworldMatrix);
         this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.BTvertices, 0, 1, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         this.effect.parameters['xWorld'].setValue(this.FworldMatrix);
-        this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.Fvertices, 0, 2, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
+        this.graphicsDevice.drawUserPrimitives(JSXna.Framework.Graphics.PrimitiveType.TriangleList, this.Fvertices, 0, 5, JSXna.Framework.Graphics.VertexPositionColor.VertexDeclaration);
         
     this.spriteBatch.end();
     

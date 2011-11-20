@@ -3,6 +3,7 @@ var effect = JSXna.Framework.Utils.CustomObject.namespace('JSXna.Framework.Graph
 
 effect.BasicEffect = {};
 effect.BasicEffect.xWorld = null;
+effect.BasicEffect.xView = null;
 
 /**
  * Initializes a new instance of this class.
@@ -32,6 +33,14 @@ effect.Effect.prototype.parameters =
         setValue : function(value)
         {
             JSXna.Framework.Graphics.BasicEffect.xWorld = value;
+        }
+    },
+    
+    xView :
+    {
+        setValue : function(value)
+        {
+            JSXna.Framework.Graphics.BasicEffect.xView = value;
         }
     }
 };
