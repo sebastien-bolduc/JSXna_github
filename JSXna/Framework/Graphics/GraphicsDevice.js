@@ -140,13 +140,13 @@ graphicsDevice.GraphicsDevice.prototype.applyFrustnum = function(vertexData)
     var cv = Math.cos(verticalAngle);
     
     // left
-    newVertexData = this.applyClippingPlane(vertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(ch, 0, sh)), -300), -1);
+    newVertexData = this.applyClippingPlane(vertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(ch, 0, sh)), -400), -1);
     // right
-    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(-ch, 0, sh)), -300), -1);
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(-ch, 0, sh)), -400), -1);
     // top
-    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, cv, sv)), -300), -1);
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, cv, sv)), -250), -1);
     // bottom
-    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, -cv, sv)), -300), -1);
+    newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, -cv, sv)), -250), -1);
     // near
     newVertexData = this.applyClippingPlane(newVertexData, new JSXna.Framework.Plane(JSXna.Framework.Vector3.normalize(new JSXna.Framework.Vector3(0, 0, -1)), 500), 1);
     

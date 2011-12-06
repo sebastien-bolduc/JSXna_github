@@ -116,53 +116,53 @@ game1.Game1.prototype.BTsetUpVertices = function()
 game1.Game1.prototype.FsetUpVertices = function()
 {
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[0].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[0].position = new JSXna.Framework.Vector3(0, 251, -800);
     this.Fvertices[0].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[1].position = new JSXna.Framework.Vector3(-1600, 51, 800);
+    this.Fvertices[1].position = new JSXna.Framework.Vector3(-1600, 251, 800);
     this.Fvertices[1].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[2].position = new JSXna.Framework.Vector3(0, 51, 800);
+    this.Fvertices[2].position = new JSXna.Framework.Vector3(0, 251, 800);
     this.Fvertices[2].color = "#00FF00";
     
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[3].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[3].position = new JSXna.Framework.Vector3(0, 251, -800);
     this.Fvertices[3].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[4].position = new JSXna.Framework.Vector3(1600, 51, 800);
+    this.Fvertices[4].position = new JSXna.Framework.Vector3(1600, 251, 800);
     this.Fvertices[4].color = "#00FF00";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[5].position = new JSXna.Framework.Vector3(0, 51, 800);
+    this.Fvertices[5].position = new JSXna.Framework.Vector3(0, 251, 800);
     this.Fvertices[5].color = "#00FF00";
     
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[6].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[6].position = new JSXna.Framework.Vector3(0, 251, -800);
     this.Fvertices[6].color = "#FF0000";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[7].position = new JSXna.Framework.Vector3(1600, 51, 800);
+    this.Fvertices[7].position = new JSXna.Framework.Vector3(1600, 251, 800);
     this.Fvertices[7].color = "#FF0000";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[8].position = new JSXna.Framework.Vector3(1600, 51, -2400);
+    this.Fvertices[8].position = new JSXna.Framework.Vector3(1600, 251, -2400);
     this.Fvertices[8].color = "#FF0000";
     
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[9].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[9].position = new JSXna.Framework.Vector3(0, 251, -800);
     this.Fvertices[9].color = "#0000FF";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[10].position = new JSXna.Framework.Vector3(-1600, 51, 800);
+    this.Fvertices[10].position = new JSXna.Framework.Vector3(-1600, 251, 800);
     this.Fvertices[10].color = "#0000FF";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[11].position = new JSXna.Framework.Vector3(-1600, 51, -2400);
+    this.Fvertices[11].position = new JSXna.Framework.Vector3(-1600, 251, -2400);
     this.Fvertices[11].color = "#0000FF";
     
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[12].position = new JSXna.Framework.Vector3(0, 51, -800);
+    this.Fvertices[12].position = new JSXna.Framework.Vector3(0, 251, -800);
     this.Fvertices[12].color = "#000000";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[13].position = new JSXna.Framework.Vector3(-1600, 51, -2400);
+    this.Fvertices[13].position = new JSXna.Framework.Vector3(-1600, 251, -2400);
     this.Fvertices[13].color = "#000000";
     this.Fvertices.push(new JSXna.Framework.Graphics.VertexPositionColor());
-    this.Fvertices[14].position = new JSXna.Framework.Vector3(1600, 51, -2400);
+    this.Fvertices[14].position = new JSXna.Framework.Vector3(1600, 251, -2400);
     this.Fvertices[14].color = "#000000";
 };
 
